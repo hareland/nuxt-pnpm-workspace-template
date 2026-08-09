@@ -1,5 +1,7 @@
 # nuxt-pnpm-workspace-template
 
+> Parts of this file/workspace is copied from [nuxt-pnpm-workspace-template](https://github.com/hareland/nuxt-pnpm-workspace-template) and should be updated as you develop this app.
+
 A simple scaffolding for building nuxt apps with pnpm workspace.
 
 ## Apps
