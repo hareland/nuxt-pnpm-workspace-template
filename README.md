@@ -20,6 +20,8 @@ A simple scaffolding for building nuxt apps with pnpm workspace.
 
 
 
+# Building on this template
+
 ## Clone & Create from this template:
 
 ```bash
@@ -27,3 +29,10 @@ pnpx giget@latest gh:hareland/nuxt-pnpm-workspace-template <app-name>
 ```
 
 > You can add arguments such as `--install` to automatically run "pnpm install" after cloning the template.
+
+
+## Add an existing app to the workspace
+> Check out how [giget](https://github.com/unjs/giget) works.
+```bash
+pnpx giget@latest <source:gh/ssh++> <destination>
+```
