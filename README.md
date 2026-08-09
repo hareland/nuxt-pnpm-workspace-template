@@ -20,8 +20,10 @@ A simple scaffolding for building nuxt apps with pnpm workspace.
 
 
 
-## Clone & Create from template:
+## Clone & Create from this template:
 
 ```bash
 pnpx giget@latest gh:hareland/nuxt-pnpm-workspace-template <app-name>
 ```
+
+> You can add arguments such as `--install` to automatically run "pnpm install" after cloning the template.
