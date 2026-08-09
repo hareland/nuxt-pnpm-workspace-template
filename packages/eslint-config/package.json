@@ -1,0 +1,13 @@
+{
+  "name": "@workspace/eslint-config",
+  "type": "module",
+  "exports": {
+    ".": "./index.ts"
+  },
+  "peerDependencies": {
+    "eslint": "^9.0.0||^10.0.0"
+  },
+  "devDependencies": {
+    "@nuxt/eslint-config": "^1.15.2"
+  }
+}

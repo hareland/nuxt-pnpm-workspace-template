@@ -1,0 +1,21 @@
+{
+  "name": "nuxt-pnpm-workspace-template",
+  "private": true,
+  "packageManager": "pnpm@11.18.0",
+  "scripts": {
+    "prepare:env": "pnpm -r run prepare:env",
+    "prepare:certs": "pnpm -r run prepare:certs",
+    "db:migrate": "pnpm -r run db:migrate",
+    "db:generate": "pnpm -r run db:generate",
+    "db:seed": "pnpm -r run db:seed",
+    "build:packages": "pnpm --filter './packages/**' build",
+    "build:web": "pnpm --filter './apps/web' build",
+    "cloudflare:build": "pnpm build:packages && pnpm build:web",
+    "cloudflare:deploy": "npx wrangler --cwd ./apps/web deploy && npx wrangler --cwd ./apps/web d1 migrations apply DB --remote --config .output/server/wrangler.json",
+    "test": "pnpm -r --parallel test",
+    "typecheck": "pnpm -r --parallel typecheck",
+    "lint": "pnpm -r --parallel lint",
+    "lint:fix": "pnpm -r --parallel lint:fix",
+    "clean": "pnpm -r --parallel clean && rm -rf node_modules .data"
+  }
+}
