@@ -1,0 +1,198 @@
+name: Stale PRs and Branches
+
+on:
+  schedule:
+    - cron: '0 7 * * 1' # Every Monday at 07:00 UTC (08:00 CET)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  stale-prs:
+    name: Handle Stale Pull Requests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Process stale PRs
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const MS_PER_DAY = 24 * 60 * 60 * 1000
+            const STALE_DAYS = 14   // Mark stale after 2 weeks of inactivity
+            // Adding the stale label resets `updated_at` to today.
+            // Checking `updatedAt < now - 46 days` therefore means the stale label
+            // was applied 46+ days ago with no further activity — 14 + 46 = 60 days total.
+            const DAYS_UNTIL_CLOSE_AFTER_STALE = 46
+            const STALE_LABEL = 'stale'
+
+            const now = new Date()
+            const staleThreshold = new Date(now - STALE_DAYS * MS_PER_DAY)
+            const closeThreshold = new Date(now - DAYS_UNTIL_CLOSE_AFTER_STALE * MS_PER_DAY)
+
+            // Ensure the stale label exists
+            try {
+              await github.rest.issues.createLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                name: STALE_LABEL,
+                color: 'e4e669',
+                description: 'This item has not had recent activity',
+              })
+            } catch {
+              // Label already exists — ignore
+            }
+
+            // Fetch all open PRs
+            const prs = await github.paginate(github.rest.pulls.list, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+            })
+
+            for (const pr of prs) {
+              const updatedAt = new Date(pr.updated_at)
+              const author = pr.user.login
+              const isStale = pr.labels.some(l => l.name === STALE_LABEL)
+
+              if (isStale && updatedAt < closeThreshold) {
+                // PR has been stale for 46+ days with no activity → close it
+                core.info(`Closing stale PR #${pr.number}: "${pr.title}"`)
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: pr.number,
+                  body: `⏰ Closing this PR due to 60 days of inactivity.\n\n@${author} Feel free to reopen it if you would like to continue working on this.`,
+                })
+                await github.rest.pulls.update({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: pr.number,
+                  state: 'closed',
+                })
+              } else if (!isStale && updatedAt < staleThreshold) {
+                // PR has been inactive for 2 weeks → mark stale and notify author
+                core.info(`Marking PR #${pr.number} as stale: "${pr.title}"`)
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: pr.number,
+                  labels: [STALE_LABEL],
+                })
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: pr.number,
+                  body: `👋 @${author} This PR has been inactive for 2 weeks. Is this still being worked on?\n\nIf there is no activity within the next 46 days this PR will be automatically closed. Push a commit or leave a comment to keep it open.`,
+                })
+              }
+            }
+
+  stale-branches:
+    name: Report Stale Branches
+    runs-on: ubuntu-latest
+    steps:
+      - name: Find and report stale branches
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const MS_PER_DAY = 24 * 60 * 60 * 1000
+            const STALE_DAYS = 60
+            const PROTECTED_BRANCHES = ['main', 'staging']
+            const STALE_BRANCH_LABEL = 'stale-branches'
+
+            const now = new Date()
+            const staleThreshold = new Date(now - STALE_DAYS * MS_PER_DAY)
+            const staleBranches = []
+
+            // Fetch all branches
+            const branches = await github.paginate(github.rest.repos.listBranches, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            })
+
+            for (const branch of branches) {
+              if (PROTECTED_BRANCHES.includes(branch.name)) continue
+
+              const { data: commitData } = await github.rest.repos.getCommit({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: branch.commit.sha,
+              })
+
+              const commitDate = new Date(commitData.commit.committer.date)
+              if (commitDate < staleThreshold) {
+                const daysOld = Math.floor((now - commitDate) / MS_PER_DAY)
+                staleBranches.push({
+                  name: branch.name,
+                  lastCommit: commitDate.toISOString().split('T')[0],
+                  daysOld,
+                })
+              }
+            }
+
+            if (staleBranches.length === 0) {
+              core.info('No stale branches found.')
+              return
+            }
+
+            core.info(`Found ${staleBranches.length} stale branch(es).`)
+
+            // Ensure the stale-branches label exists
+            try {
+              await github.rest.issues.createLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                name: STALE_BRANCH_LABEL,
+                color: 'd4c5f9',
+                description: 'Tracks branches with no recent activity',
+              })
+            } catch {
+              // Label already exists — ignore
+            }
+
+            const branchList = staleBranches
+              .sort((a, b) => b.daysOld - a.daysOld)
+              .map(b => `- \`${b.name}\` — ${b.daysOld} days since last commit (${b.lastCommit})`)
+              .join('\n')
+
+            const issueBody = [
+              'The following branches have had no commits for more than 60 days:',
+              '',
+              branchList,
+              '',
+              'Please review these branches and delete them if they are no longer needed.',
+              '',
+              `_Last updated: ${now.toISOString().split('T')[0]}_`,
+            ].join('\n')
+
+            // Update an existing open issue or create a new one
+            const { data: existingIssues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: STALE_BRANCH_LABEL,
+            })
+
+            if (existingIssues.length > 0) {
+              const issue = existingIssues[0]
+              core.info(`Updating existing issue #${issue.number}`)
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: issueBody,
+              })
+            } else {
+              core.info('Creating new stale branches issue')
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: '🍂 Stale Branches Report',
+                body: issueBody,
+                labels: [STALE_BRANCH_LABEL],
+              })
+            }
