@@ -1,11 +1,13 @@
 {
   "$schema": "https://renovatebot.com",
-  "extends": ["config:recommended"],
+  "extends": [
+    "config:recommended",
+    ":keepLockFileFiltered"
+  ],
   "packageRules": [
     {
       "matchManagers": ["npm"],
-      "matchUpdateTypes": ["minor", "patch", "major"],
-      "groupName": "Workspace internal minor/patch dependencies",
+      "rangeStrategy": "update-lockfile",
       "postUpdateOptions": ["pnpmDedupe"]
     }
   ]

@@ -1,0 +1,17 @@
+name: Renovate (Manual Trigger)
+
+on:
+  workflow_dispatch: # Enables the manual "Run workflow" button
+
+jobs:
+  renovate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Self-hosted Renovate
+        uses: renovatebot/github-action@v41.0.6
+        with:
+          configurationFile: renovate.json
+          token: ${{ secrets.RENOVATE_TOKEN }}
