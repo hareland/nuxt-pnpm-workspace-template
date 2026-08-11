@@ -25,7 +25,7 @@ jobs:
             // Adding the stale label resets `updated_at` to today.
             // Checking `updatedAt < now - 46 days` therefore means the stale label
             // was applied 46+ days ago with no further activity — 14 + 46 = 60 days total.
-            const DAYS_UNTIL_CLOSE_AFTER_STALE = 46
+            const DAYS_UNTIL_CLOSE_AFTER_STALE = 60 - STALE_DAYS
             const STALE_LABEL = 'stale'
 
             const now = new Date()
