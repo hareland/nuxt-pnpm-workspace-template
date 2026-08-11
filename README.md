@@ -42,7 +42,7 @@ pnpx giget@latest <source:gh/ssh++> <destination>
 
 ## Apps
 
-- [@workspace/web](./apps/web) — the main web application (product)
+- [@workspace/web](./apps/web) - the main web application (product)
 
 > Keep this list up to date.
 
@@ -56,24 +56,24 @@ pnpx giget@latest <source:gh/ssh++> <destination>
 
 Keeps an app folder (e.g. `apps/web`) in sync with its source template repository, without submodules.
 
-> Variable names are just for convenience — swap in whatever fits your case.
+> Variable names are just for convenience, swap with whatever fits your case.
 
 ### 1. Prepare variables
 
 ```bash
-REMOTE_NAME=app-template                    
-REPOSITORY_NAME=hareland/nuxt-app-template  
-WORKSPACE_PATH=apps/web                     
+REMOTE_NAME=apps-web-template
+REMOTE_REPOSITORY=git@github.com:hareland/nuxt-app-template.git
+WORKSPACE_PATH=apps/web
 ```
 
 > `REMOTE_NAME` is the name of the remote to use for fetching updates. <br/>
-> `REPOSITORY_NAME` is the name of the template repository. <br/>
+> `REMOTE_REPOSITORY` is the name of the template repository. <br/>
 > `WORKSPACE_PATH` is the path to the app folder in the workspace. <br/>
 
 ### 2. Add the template repository as a remote
 
 ```bash
-git remote add $REMOTE_NAME git@github.com:$REPOSITORY_NAME.git
+git remote add $REMOTE_NAME $REMOTE_REPOSITORY
 git fetch $REMOTE_NAME
 ```
 
