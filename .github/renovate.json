@@ -1,0 +1,12 @@
+{
+  "$schema": "https://renovatebot.com",
+  "extends": ["config:recommended"],
+  "packageRules": [
+    {
+      "matchManagers": ["npm"],
+      "matchUpdateTypes": ["minor", "patch", "major"],
+      "groupName": "Workspace internal minor/patch dependencies",
+      "postUpdateOptions": ["pnpmDedupe"]
+    }
+  ]
+}
