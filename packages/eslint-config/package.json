@@ -1,6 +1,11 @@
 {
   "name": "@workspace/eslint-config",
   "type": "module",
+  "scripts": {
+    "typecheck": "eslint .",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
   "exports": {
     ".": "./src/index.ts"
   },
