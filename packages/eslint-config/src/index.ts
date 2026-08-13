@@ -5,7 +5,7 @@ export default createConfigForNuxt({
     tooling: true,
     stylistic: true,
     standalone: true,
-    typescript: true
+    typescript: true,
   },
 }, {
   ignores: ['dist/**', '.nuxt/**', '.output/**', '.data/**'],

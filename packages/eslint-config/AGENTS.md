@@ -7,4 +7,4 @@ in the app itself - then never change it)
 
 ## Usage
 
-See the [./example](./example) folder for sample minimal config.
+See the [.example](./.example) folder for sample minimal config.
