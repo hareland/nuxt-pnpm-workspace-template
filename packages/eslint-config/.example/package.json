@@ -2,7 +2,7 @@
   "name": "@example/name",
   "devDependencies": {
     "eslint": "^10.8.1",
-    "@workspace/eslint-config": "workspace:*"
+    "@workspace/eslint-config": "../"
   },
   "scripts": {
     "lint": "eslint .",
