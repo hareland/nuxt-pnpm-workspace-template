@@ -181,7 +181,7 @@ before committing. Use `git rm -r --cached <path>` to untrack any files accident
   ```bash
   pnpm changeset
   ```
-  Not needed for `apps/web`-only changes.
+  Not needed for `apps/**`-only changes.
 
 ---
 
@@ -191,4 +191,4 @@ before committing. Use `git rm -r --cached <path>` to untrack any files accident
   in the root `package.json` or a package's own `README.md`/`AGENTS.md` differ from what's written here, those local
   sources of truth win — update this file to match reality when you notice a mismatch.
 - Prefer adding shared logic to `packages/**` over duplicating it inside
-  `apps/web`, but don't create a new package for a single one-off helper.
+  `apps/**`, but don't create a new package for a single one-off helper.

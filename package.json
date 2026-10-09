@@ -1,7 +1,7 @@
 {
   "name": "nuxt-pnpm-workspace-template",
   "private": true,
-  "packageManager": "pnpm@11.18.0",
+  "packageManager": "pnpm@12.10.0",
   "scripts": {
     "prepare:env": "pnpm -r run prepare:env",
     "prepare:certs": "pnpm -r run prepare:certs",
@@ -16,6 +16,6 @@
     "typecheck": "pnpm -r --parallel typecheck",
     "lint": "pnpm -r --parallel lint",
     "lint:fix": "pnpm -r --parallel lint:fix",
-    "clean": "pnpm -r --parallel clean && rm -rf node_modules .data"
+    "clean": "pnpm -r --parallel clean --if-present && rm -rf node_modules .data"
   }
 }
