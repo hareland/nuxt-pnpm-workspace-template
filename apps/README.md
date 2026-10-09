@@ -1,0 +1,3 @@
+## `apps/**`
+
+- [@workspace/web](./web)

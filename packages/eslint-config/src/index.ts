@@ -8,5 +8,5 @@ export default createConfigForNuxt({
     typescript: true,
   },
 }, {
-  ignores: ['dist/**', '.nuxt/**', '.output/**', '.data/**', '.example/**'],
+  ignores: ['dist/**', '.nuxt/**', '.output/**', '.data/**', '.example/**', 'playground/**'],
 })
